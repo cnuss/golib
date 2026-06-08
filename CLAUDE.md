@@ -42,11 +42,17 @@ REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
 
 - **Branch protection on `main`.** The PR flow assumes it; a fresh repo has none.
   - Check: `gh api repos/$REPO/branches/main/protection >/dev/null 2>&1 && echo protected || echo UNPROTECTED`
-  - Fix (require the `ci` check, block force-push; needs ≥1 CI run so the check
-    name resolves):
+  - Fix (require the `ci` matrix checks, block force-push). The required
+    contexts are the matrix cells `ci (<os>, <go>)`, not bare `ci` — list the
+    live names first, then require them:
     ```sh
+    # discover the real check names from the latest commit on main
+    gh api repos/$REPO/commits/main/check-runs --jq '.check_runs[].name'
+
     gh api -X PUT repos/$REPO/branches/main/protection --input - <<'JSON'
-    {"required_status_checks":{"strict":true,"contexts":["ci (min)","ci (stable)"]},
+    {"required_status_checks":{"strict":true,"contexts":[
+       "ci (ubuntu-latest, min)","ci (ubuntu-latest, stable)",
+       "ci (windows-2025-vs2026, min)","ci (windows-2025-vs2026, stable)"]},
      "enforce_admins":true,"required_pull_request_reviews":null,"restrictions":null,
      "allow_force_pushes":false,"allow_deletions":false}
     JSON
