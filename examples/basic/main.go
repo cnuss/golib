@@ -1,4 +1,4 @@
-// Command hello is the smallest golib example: build a value through the
+// Command basic is the smallest golib example: build a value through the
 // generic builder and print the result.
 package main
 

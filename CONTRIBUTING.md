@@ -56,7 +56,7 @@ make e2e    # builds and runs every example binary
 Run a specific example locally:
 
 ```sh
-make run hello
+make run basic
 make run named
 ```
 

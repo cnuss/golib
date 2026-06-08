@@ -65,7 +65,7 @@ func TestExamples(t *testing.T) {
 		name string
 		want string
 	}{
-		{"hello", "greeting: hello world"},
+		{"basic", "greeting: hello world"},
 		{"named", "widget: {ID:7"},
 	}
 	for _, tc := range cases {

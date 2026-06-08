@@ -47,7 +47,7 @@ func main() {
 }
 ```
 
-(Full source: [`examples/hello/main.go`](./examples/hello/main.go).)
+(Full source: [`examples/basic/main.go`](./examples/basic/main.go).)
 
 ## Layout
 
@@ -91,13 +91,13 @@ Self-contained programs in [`./examples`](./examples):
 
 | Example | Demonstrates                                          |
 | ------- | ----------------------------------------------------- |
-| `hello` | Smallest wiring — `New` + `WithValue` + `Build`.      |
+| `basic` | Smallest wiring — `New` + `WithValue` + `Build`.      |
 | `named` | A typed struct payload carried through `WithValue`.   |
 
 Run one locally:
 
 ```sh
-make run hello
+make run basic
 make run named
 ```
 
