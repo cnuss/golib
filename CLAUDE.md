@@ -8,7 +8,7 @@ agent-specific framing.
 
 1. [README.md](./README.md) — what the library does + public surface
 2. [CONTRIBUTING.md](./CONTRIBUTING.md) — layout, dev loop, conventions, PR flow
-3. [`v1/api.go`](./v1/api.go) — public `Builder[T]` interface + `Result[T]`
+3. [`v1/v1.go`](./v1/v1.go) — public `Builder[T]` interface + `Result[T]`
 4. [`examples/basic/main.go`](./examples/basic/main.go) — minimal call site
 
 ## Before you touch anything
@@ -51,8 +51,12 @@ REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
 
     gh api -X PUT repos/$REPO/branches/main/protection --input - <<'JSON'
     {"required_status_checks":{"strict":true,"contexts":[
-       "ci (ubuntu-latest, min)","ci (ubuntu-latest, stable)",
-       "ci (windows-2025-vs2026, min)","ci (windows-2025-vs2026, stable)"]},
+       "ci (ubuntu-24.04, min)","ci (ubuntu-24.04, stable)",
+       "ci (windows-2025, min)","ci (windows-2025, stable)",
+       "ci (ubuntu-24.04-arm, min)","ci (ubuntu-24.04-arm, stable)",
+       "ci (windows-11-arm, min)","ci (windows-11-arm, stable)",
+       "ci (macos-26-intel, min)","ci (macos-26-intel, stable)",
+       "ci (macos-26, min)","ci (macos-26, stable)"]},
      "enforce_admins":true,"required_pull_request_reviews":null,"restrictions":null,
      "allow_force_pushes":false,"allow_deletions":false}
     JSON
