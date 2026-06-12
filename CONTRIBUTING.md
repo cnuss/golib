@@ -11,8 +11,8 @@ Deep-link by filename; line numbers will drift.
 | Topic                                          | Source                                                           |
 | ---------------------------------------------- | ---------------------------------------------------------------- |
 | Façade (`New`)                                 | [`lib.go`](./lib.go)                                             |
-| Stable interface (`Builder[T]` + `Result[T]`)  | [`v1/api.go`](./v1/api.go)                                       |
-| Implementation struct + `New[T]` constructor   | [`v1alpha1/impl.go`](./v1alpha1/impl.go)                         |
+| Stable interface (`Builder[T]` + `Result[T]`)  | [`v1/v1.go`](./v1/v1.go)                                         |
+| Implementation struct + `New[T]` constructor   | [`v1alpha1/v1alpha1.go`](./v1alpha1/v1alpha1.go)                 |
 | Builder methods (`WithName`, `WithValue`, …)   | [`v1alpha1/builder.go`](./v1alpha1/builder.go)                   |
 | Unit tests + fuzz target                       | [`v1alpha1/builder_test.go`](./v1alpha1/builder_test.go)         |
 | godoc examples                                 | [`v1/example_test.go`](./v1/example_test.go)                     |
