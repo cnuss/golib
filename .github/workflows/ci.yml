@@ -85,17 +85,20 @@ jobs:
             exit 1
           fi
 
+      # The make targets export CGO_ENABLED=0 (see Makefile) — the library is
+      # pure Go, and windows-11-arm runners ship an x86_64 gcc that can't
+      # assemble runtime/cgo's arm64 stubs.
       - name: go vet
-        run: go vet ./...
+        run: make vet
 
       - name: go build
-        run: go build ./...
+        run: make build
 
-      - name: lib tests
-        run: go test ./v1alpha1/...
+      - name: tests
+        run: make test
 
       - name: e2e
-        run: go test -count=1 -v ./e2e/...
+        run: make e2e
 
   release:
     needs: [ci]

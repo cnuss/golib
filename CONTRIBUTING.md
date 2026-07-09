@@ -60,6 +60,19 @@ make run basic
 make run named
 ```
 
+## Test layout
+
+Three tiers, each with a distinct job — don't blur them:
+
+- **`*_test.go` next to the code** — unit tests: anything with fabricated
+  inputs or fakes, however elaborate. Includes fuzz targets and the godoc
+  examples in [`v1/example_test.go`](./v1/example_test.go).
+- **`examples/`** — real-world, simple-ish API usage written for humans. An
+  example demonstrates; it never asserts. Assertion logic belongs in `e2e/`.
+- **`e2e/`** — the harness builds and runs the example binaries and asserts
+  on their output. If a check can pass without running an example binary, it
+  is a unit test, not e2e.
+
 ## Before you push
 
 - `gofmt -w .`
