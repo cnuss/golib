@@ -111,12 +111,11 @@ jobs:
           cache: true
 
       - name: race tests
-        # Run go directly (not make, which exports CGO_ENABLED=0) with CGO on
-        # so the race detector links. The matrix above can't host this lane:
-        # it forces CGO off for cross-host determinism.
-        env:
-          CGO_ENABLED: "1"
-        run: go test -race ./...
+        # The make target owns the lane's definition (CGO on for the detector,
+        # which the matrix above can't provide — it forces CGO off for
+        # cross-host determinism), so a CI race find reproduces locally with
+        # the same command.
+        run: make race
 
   release:
     needs: [ci, race]
