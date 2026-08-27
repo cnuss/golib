@@ -85,6 +85,13 @@ REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
     JSON
     ```
 
+- **Merge settings** — auto-merge and branch cleanup. `allow_auto_merge` lets a
+  PR be armed with `gh pr merge --auto --squash` so GitHub merges it once the
+  required checks go green (nobody has to watch); `delete_branch_on_merge`
+  keeps stale branches from piling up.
+  - Check: `gh api repos/$REPO --jq '{allow_auto_merge, delete_branch_on_merge}'`
+  - Fix: `gh api -X PATCH repos/$REPO -F allow_auto_merge=true -F delete_branch_on_merge=true`
+
 These are admin actions, not part of the per-change PR flow. The session-start
 audit catches them when standing up a repo from this template and flags drift
 later.
