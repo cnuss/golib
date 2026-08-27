@@ -215,6 +215,18 @@ To opt a commit out of the auto-bump, put `[skip release]` on its own
 line in the commit body. (It must be the only thing on its line, so
 prose mentioning the token inline doesn't accidentally suppress.)
 
+Releases are also gated on go.mod declaring this repository's own module
+path. A repo freshly stamped from this template still declares the
+template's path, and the push that creates it lands on `main` and
+reaches the release job — without the gate it would publish a version
+whose go.mod names a different module. `proxy.golang.org` caches that
+immutably, so the version can never be made valid: re-tagging keeps
+serving the cached copy, and deleting the tag only makes the auto-bump
+walk back into it. The gate turns that unrecoverable outcome into a
+skipped job with a notice. The `/vN` major-version suffix is stripped
+before comparing, since it appears in the module path but not in the
+repository path.
+
 For a minor or major bump, tag locally and push the tag — the workflow
 treats a manual tag as the version of record and skips the bump:
 

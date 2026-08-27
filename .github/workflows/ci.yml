@@ -122,6 +122,26 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Refuse to release under a module path that isn't this repository.
+          # A repo freshly stamped from this template still declares the
+          # template's module path, and the very push that creates it lands on
+          # main and reaches this job — so it would publish a version whose
+          # go.mod names a different module. proxy.golang.org caches that
+          # immutably: the version can never be made valid, re-tagging keeps
+          # serving the cached copy, and deleting the tag only makes the
+          # auto-bump walk back into it. Skipping is the recoverable outcome.
+          #
+          # The /vN major-version suffix lives in the module path but not in
+          # the repository path, so strip it before comparing — otherwise
+          # every release from v2 onward would be skipped.
+          mod=$(awk '/^module /{print $2; exit}' go.mod)
+          base=$(printf '%s' "$mod" | sed -E 's|/v[0-9]+$||')
+          if [ "$base" != "github.com/${GITHUB_REPOSITORY}" ]; then
+            echo "::notice::go.mod declares ${mod}, but this repo is github.com/${GITHUB_REPOSITORY} — skipping release. Rename the module before releasing."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           if [[ "$GITHUB_REF" == refs/tags/* ]]; then
             # Manual tag push (minor/major bumps): use the tag as-is.
             echo "tag=${GITHUB_REF_NAME}"      >> "$GITHUB_OUTPUT"

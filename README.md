@@ -3,6 +3,11 @@ Made from this template? Find/replace "golib" → your library name across the
 repo, update lib.go's `package golib` clause, then delete this comment.
 `make all` should stay green. (Workflows read GITHUB_REPOSITORY at runtime, so
 they need no edits.)
+
+Releases are held until that rename lands: the release job skips while go.mod
+still declares this template's module path, so the first push to your new repo
+can't publish a version under the wrong module. Your first release is whatever
+the auto-bump picks after the rename merges.
 -->
 
 # golib
