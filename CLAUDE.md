@@ -42,9 +42,9 @@ REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
 
 - **Branch protection on `main`.** The PR flow assumes it; a fresh repo has none.
   - Check: `gh api repos/$REPO/branches/main/protection >/dev/null 2>&1 && echo protected || echo UNPROTECTED`
-  - Fix (require the `ci` matrix checks, block force-push). The required
-    contexts are the matrix cells `ci (<os>, <go>)`, not bare `ci` — list the
-    live names first, then require them:
+  - Fix (require every `ci.yml` gating check, block force-push). The required
+    contexts are the matrix cells `ci (<os>, <go>)`, not bare `ci`, plus the
+    standalone `race` lane — list the live names first, then require them:
     ```sh
     # discover the real check names from the latest commit on main
     gh api repos/$REPO/commits/main/check-runs --jq '.check_runs[].name'
@@ -56,10 +56,19 @@ REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
        "ci (ubuntu-24.04-arm, min)","ci (ubuntu-24.04-arm, stable)",
        "ci (windows-11-arm, min)","ci (windows-11-arm, stable)",
        "ci (macos-26-intel, min)","ci (macos-26-intel, stable)",
-       "ci (macos-26, min)","ci (macos-26, stable)"]},
+       "ci (macos-26, min)","ci (macos-26, stable)",
+       "race"]},
      "enforce_admins":true,"required_pull_request_reviews":null,"restrictions":null,
      "allow_force_pushes":false,"allow_deletions":false}
     JSON
+    ```
+    This list is authoritative, not additive — the endpoint replaces the
+    required contexts with exactly what it is given. A lane missing from it is
+    silently un-required, so a new gating job in
+    [`ci.yml`](./.github/workflows/ci.yml) has to be added here in the same
+    change. To confirm what is live rather than what is written down:
+    ```sh
+    gh api repos/$REPO/branches/main/protection/required_status_checks --jq '.contexts'
     ```
 
 - **Private vulnerability reporting.** Lets researchers file advisories privately
