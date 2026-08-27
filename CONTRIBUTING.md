@@ -17,6 +17,7 @@ Deep-link by filename; line numbers will drift.
 | Builder methods (`WithName`, `WithValue`, …)   | [`v1alpha1/builder.go`](./v1alpha1/builder.go)                   |
 | Env helpers (`EnvBool`, `EnvDuration`, `Logger`) | [`v1alpha1/env.go`](./v1alpha1/env.go)                         |
 | Unit tests + fuzz target                       | [`v1alpha1/builder_test.go`](./v1alpha1/builder_test.go)         |
+| Façade + `Version` tests                       | [`lib_test.go`](./lib_test.go)                                   |
 | godoc examples                                 | [`v1/example_test.go`](./v1/example_test.go)                     |
 | e2e harness + runner                           | [`e2e/e2e_test.go`](./e2e/e2e_test.go)                           |
 | Worked examples                                | [`examples/`](./examples)                                        |
@@ -105,6 +106,37 @@ Three tiers, each with a distinct job — don't blur them:
 - **`e2e/`** — the harness builds and runs the example binaries and asserts
   on their output. If a check can pass without running an example binary, it
   is a unit test, not e2e.
+
+### One test file per source file
+
+A test file mirrors its source file and takes its name: `something.go` is
+tested by `something_test.go`, and that is the only test file for it. Don't
+mint a second file per topic, per concern, or per test style —
+`version_internal_test.go`, `builder_edge_cases_test.go`,
+`env_validation_test.go` all name a *use case* rather than a source file, and
+none of them should exist.
+
+The pull is real, so it's worth naming why we resist it. A topic-named file
+looks tidy the day it's added and stops being findable a month later: the tests
+for one symbol scatter across files whose names only their author can predict,
+nothing tells you which file a new test belongs in, and two files quietly grow
+overlapping coverage of the same function. Pairing with the source file removes
+the judgment call — there is exactly one answer, and it's the same answer every
+time.
+
+If a test file grows unwieldy, that's a signal about the *source* file, not the
+test file. Split the source, and the tests split with it along the same seam.
+
+Two deliberate exceptions:
+
+- **`v1/example_test.go`** — godoc examples. `example_test.go` is an
+  established Go idiom and reads as documentation, so it keeps its name.
+- **`e2e/`** — a test-only package, so there's no source file to pair with.
+
+One consequence worth knowing: a source file whose tests need both unexported
+access and an outside-the-package view still gets one test file, so it is
+`package <pkg>` (internal) and the external view is covered elsewhere. See the
+header of [`lib_test.go`](./lib_test.go) for how that trade is recorded.
 
 ## Before you push
 
