@@ -1,11 +1,12 @@
-.PHONY: all check fmt fmt-check vet build windows test e2e run
+.PHONY: all check fmt fmt-check vet build windows test race e2e run
 
 # The library is pure Go. Forcing CGO off keeps every build identical across
 # hosts and sidesteps broken toolchains (e.g. windows-11-arm runners ship an
 # x86_64 gcc that can't assemble runtime/cgo's arm64 stubs).
 export CGO_ENABLED = 0
 
-# Default: everything CI runs except the auto-bump release step.
+# Default: everything CI runs except the race lane (needs a C toolchain — run
+# `make race` for it) and the auto-bump release step.
 all: fmt-check vet build windows test e2e
 
 # Compose the common pre-push checklist. Mirrors the CI matrix.
@@ -37,6 +38,18 @@ windows:
 # Library unit + fuzz tests (v1alpha1) plus the godoc examples (v1).
 test:
 	go test ./...
+
+# Every package under the race detector — the same lane CI runs, runnable
+# locally to reproduce a CI race find. The recipe-line CGO_ENABLED=1 overrides
+# the global export above: the detector links through cgo. Kept out of `all`
+# for that reason — it is the one target needing a C toolchain.
+#
+# If this library ever grows a live e2e tier gated on testing.Short(), this
+# lane must pass -short too: without it the live cases start running under the
+# detector on every CI run, which is exactly the traffic the tiering exists to
+# avoid.
+race:
+	CGO_ENABLED=1 go test -race ./...
 
 # End-to-end: the harness builds and drives every example binary. -count=1 disables
 # go test caching, since the harness builds the example binaries at runtime and the
