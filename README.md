@@ -8,7 +8,6 @@ they need no edits.)
 # golib
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/cnuss/golib.svg)](https://pkg.go.dev/github.com/cnuss/golib)
-[![Go Report Card](https://goreportcard.com/badge/github.com/cnuss/golib)](https://goreportcard.com/report/github.com/cnuss/golib)
 [![CI](https://github.com/cnuss/golib/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/cnuss/golib/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/cnuss/golib/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/cnuss/golib/actions/workflows/codeql.yml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/cnuss/golib/badge)](https://scorecard.dev/viewer/?uri=github.com/cnuss/golib)
