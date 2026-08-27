@@ -40,11 +40,12 @@ jobs:
           - windows-11-arm
           - macos-26-intel
           - macos-26
-        # "min" reads the floor from go.mod (the `go X.Y` directive); "stable"
-        # is whatever setup-go's `stable` alias resolves to. Keeping "min"
-        # symbolic avoids drift between go.mod and the workflow when the floor
-        # is bumped.
-        go: [min, stable]
+        # Whatever setup-go's `stable` alias resolves to. Single-valued, but
+        # kept as a matrix dimension: it keeps the check context names
+        # (`ci (<os>, stable)`) stable, and another version can be added here
+        # without renaming every existing one — a rename means updating the
+        # branch-protection required contexts.
+        go: [stable]
     defaults:
       run:
         # bash on Windows runners comes from git-for-windows (MSYS) and matches
@@ -54,22 +55,9 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: resolve go version
-        id: goversion
-        # "min" → the `go X.Y` directive in go.mod (the declared floor).
-        # Anything else (e.g. "stable") passes through unchanged so setup-go's
-        # aliases keep working.
-        run: |
-          if [ "${{ matrix.go }}" = "min" ]; then
-            v=$(awk '/^go [0-9]/ {print $2; exit}' go.mod)
-            echo "version=$v" >> "$GITHUB_OUTPUT"
-          else
-            echo "version=${{ matrix.go }}" >> "$GITHUB_OUTPUT"
-          fi
-
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version: ${{ steps.goversion.outputs.version }}
+          go-version: ${{ matrix.go }}
           cache: true
 
       - name: gofmt
@@ -111,12 +99,11 @@ jobs:
           cache: true
 
       - name: race tests
-        # Run go directly (not make, which exports CGO_ENABLED=0) with CGO on
-        # so the race detector links. The matrix above can't host this lane:
-        # it forces CGO off for cross-host determinism.
-        env:
-          CGO_ENABLED: "1"
-        run: go test -race ./...
+        # The make target owns the lane's definition (CGO on for the detector,
+        # which the matrix above can't provide — it forces CGO off for
+        # cross-host determinism), so a CI race find reproduces locally with
+        # the same command.
+        run: make race
 
   release:
     needs: [ci, race]
